@@ -1,0 +1,43 @@
+def prepare_key(key):
+    key = key.upper().replace("J", "I")
+    key = "".join(sorted(set(key), key=key.index))
+    key_matrix = [key[i:i+5] for i in range(0, len(key), 5)]
+    return key_matrix
+
+def find_position(key_matrix, letter):
+    for row in range(5):
+        for col in range(5):
+            if key_matrix[row][col] == letter:
+                return row, col
+    return -1, -1
+
+def decrypt_playfair(ciphertext, key):
+    key_matrix = prepare_key(key)
+    plaintext = ""
+
+    if len(ciphertext) % 2 == 1:
+        ciphertext += 'X'  # Add a placeholder character
+
+    for i in range(0, len(ciphertext), 2):
+        char1, char2 = ciphertext[i], ciphertext[i+1]
+
+        row1, col1 = find_position(key_matrix, char1)
+        row2, col2 = find_position(key_matrix, char2)
+
+        if row1 == row2:
+            plaintext += key_matrix[row1][(col1 - 1) % 5] + key_matrix[row2][(col2 - 1) % 5]
+        elif col1 == col2:
+            plaintext += key_matrix[(row1 - 1) % 5][col1] + key_matrix[(row2 - 1) % 5][col2]
+        else:
+            plaintext += key_matrix[row1][col2] + key_matrix[row2][col1]
+
+    return plaintext
+
+# Provided ciphertext and key
+ciphertext = "KXJEY UREBE ZWEHE WRYTU HEYFS KREHE GOYFI WTTTU OLKSY CAJPO BOTEI ZONTX BYBNT GONEY CUZWR GDSON SXBOU YWRHE BAAHY USEDQ"
+key = "PLAYFIREXMBCDGHKNOQSTUVWZ"
+
+# Decrypt the message
+decrypted_message = decrypt_playfair(ciphertext, key)
+print("Decrypted Message:")
+print(decrypted_message)
